@@ -55,27 +55,27 @@ export const login = async (req, res) => {
     try {
         const [rows] = await pool.query("SELECT * FROM users WHERE username = ?", [username]);
         if (rows.length === 0) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(401).json({ message: "Invalid credentials" });
         }
 
         const user = rows[0];
         if (!user.isActive) {
-            return res.status(400).json({ message: "Please activate your account first" });
+            return res.status(403).json({ message: "Please activate your account first" });
         }
         
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(401).json({ message: "Invalid credentials" });
         }
 
         const accessToken = jwt.sign(
-            { id: user.id, username: user.username },
+            { id: user.id },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: "15m" }
         );
 
         const refreshToken = jwt.sign(
-            { id: user.id, username: user.username },
+            { id: user.id },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: "7d" }
         );
