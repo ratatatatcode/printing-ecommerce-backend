@@ -80,6 +80,13 @@ export const login = async (req, res) => {
             { expiresIn: "7d" }
         );
 
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", 
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
         res.json({ accessToken, refreshToken });
     } catch (err) {
         console.error(err);
