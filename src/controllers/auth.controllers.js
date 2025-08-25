@@ -92,7 +92,7 @@ export const login = async (req, res) => {
         console.error(err);
         res.status(500).json({ message: "Server error" });
     }
-}
+};
 
 export const activateAccount = async (req, res) => {
     const { token } = req.params;
@@ -122,4 +122,4 @@ export const activateAccount = async (req, res) => {
 
         res.status(500).json({ message: "Server error." });
     }
-}
+};
