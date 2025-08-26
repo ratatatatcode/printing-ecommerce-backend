@@ -11,20 +11,21 @@ export const getCurrentUserOrders = async (req, res) => {
 };
 
 export const makeOrder = async (req, res) => {
-    const { product, design, description, recipient, contactNo, email, address } = req.body;
+    const { product, description, recipient, contactNo, email, address } = req.body;
     const userId = req.user.id;
+    const design = req.file ? `/uploads/${req.file.filename}` : null;
 
     try {
-        await pool.query(
-            `INSERT INTO orders
-            (userId, product, design, description, recipient, contactNo, email, address)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [userId, product, design, description, recipient, contactNo, email, address]
-        );
+    await pool.query(
+        `INSERT INTO orders
+        (userId, product, design, description, recipient, contactNo, email, address)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [userId, product, design, description, recipient, contactNo, email, address]
+    );
 
-        res.status(201).json({ message: "Order created successfully" });
+    res.status(201).json({ message: "Order created successfully", design });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Server error" });
     }
-}
+};
