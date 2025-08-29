@@ -1,31 +1,58 @@
 import { pool } from "../config/pool.js";
+import { supabase } from "../config/supabase.js";
 
 export const getCurrentUserOrders = async (req, res) => {
-    try {
-        const [rows] = await pool.query("SELECT * FROM orders WHERE userId = ?", [req.user.id]);
-        res.json(rows);
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: "Server error" });
-    }
+  try {
+    const [rows] = await pool.query("SELECT * FROM orders WHERE userId = ?", [req.user.id]);
+    res.json(rows);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const makeOrder = async (req, res) => {
-    const { product, description, recipient, contactNo, email, address } = req.body;
-    const userId = req.user.id;
-    const design = req.file ? `/uploads/${req.file.filename}` : null;
+  const { product, description, recipient, contactNo, email, address } = req.body;
+  const userId = req.user?.id;
+  let designUrl = null;
 
-    try {
+  try {
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (req.file) {
+      const fileName = `${Date.now()}-${req.file.originalname}`;
+
+      const { error } = await supabase.storage
+        .from("uploads")
+        .upload(fileName, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: false,
+        });
+
+      if (error) throw error;
+
+      const { data: publicData } = supabase.storage
+        .from("uploads")
+        .getPublicUrl(fileName);
+
+      designUrl = publicData?.publicUrl || null;
+    }
+
     await pool.query(
-        `INSERT INTO orders
-        (userId, product, design, description, recipient, contactNo, email, address)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [userId, product, design, description, recipient, contactNo, email, address]
+      `INSERT INTO orders
+        (userId, product, design, description, recipient, contactNo, email, address, paymentStatus)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [userId, product, designUrl, description, recipient, contactNo, email, address, "pending"]
     );
 
-    res.status(201).json({ message: "Order created successfully", design });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: "Server error" });
-    }
+    res.status(201).json({
+      message: "Order created successfully",
+      design: designUrl,
+    });
+  } catch (err) {
+    console.error("makeOrder error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
