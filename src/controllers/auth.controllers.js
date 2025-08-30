@@ -14,10 +14,23 @@ export const register = async (req, res) => {
         gender,
         address,
         password,
-        role
+        role,
+        secret = null,
     } = req.body;
 
     try {
+        if (role === "admin") {
+            if (!secret || secret !== process.env.ADMIN_SECRET) {
+                return res.status(403).json({ message: "Invalid secret key" });
+            }
+        }
+
+        if (role === "logistic") {
+            if (!secret || secret !== process.env.LOGISTIC_SECRET) {
+                return res.status(403).json({ message: "Invalid secret key" });
+            }
+        }
+
         const [existing] = await pool.query(
             "SELECT * FROM users WHERE email = ? OR username = ? OR contactNo = ?",
             [email, username, contactNo]
