@@ -11,6 +11,7 @@ export const register = async (req, res) => {
         email,
         contactNo,
         birthdate,
+        gender,
         address,
         password,
         role
@@ -30,9 +31,9 @@ export const register = async (req, res) => {
 
         await pool.query(
             `INSERT INTO users 
-            (firstName, lastName, username, email, contactNo, birthdate, address, password, role) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [firstName, lastName, username, email, contactNo, birthdate, address, hashedPassword, role]
+            (firstName, lastName, username, email, contactNo, birthdate, gender, address, password, role) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [firstName, lastName, username, email, contactNo, birthdate, gender, address, hashedPassword, role]
         );
 
         const token = jwt.sign({ email }, process.env.ACTIVATION_TOKEN, { expiresIn: "5m" });
