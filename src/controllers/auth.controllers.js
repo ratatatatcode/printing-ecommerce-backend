@@ -49,7 +49,7 @@ export const register = async (req, res) => {
             [firstName, lastName, username, email, contactNo, birthdate, gender, address, hashedPassword, role]
         );
 
-        const token = jwt.sign({ email }, process.env.ACTIVATION_TOKEN, { expiresIn: "5m" });
+        const token = jwt.sign({ email }, process.env.ACTIVATION_TOKEN, { expiresIn: "7d" });
         const url = `${process.env.BACKEND_URL}/api/auth/activate/${token}`;
 
         await sendEmail({
