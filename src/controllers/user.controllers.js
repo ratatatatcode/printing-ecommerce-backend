@@ -13,16 +13,3 @@ export const getCurrentUser = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
-
-export const cancelOrder = async (req, res) => {
-    const { orderId } = req.body
-
-    try {
-        await pool.query("UPDATE orders SET status = ? WHERE id = ?", ["Cancelled", orderId]);
-
-        res.status(200).json({ message: `Order #${orderId} has been cancelled successfully.` });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Server error" });
-    }
-}
