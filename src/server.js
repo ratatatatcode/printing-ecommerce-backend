@@ -5,6 +5,7 @@ dotenv.config();
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import orderRoutes from "./routes/order.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
@@ -21,6 +22,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/user/", userRoutes);
 app.use("/api/order/", orderRoutes);
+app.use("/api/admin/", adminRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
