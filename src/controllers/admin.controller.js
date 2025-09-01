@@ -22,6 +22,8 @@ export const updatePrice = async (req, res) => {
             subject: `Price Update for Order: #${orderId}`,
             text: "Your order has been evaluated. Please proceed to pay the updated price listed on our website."
         });
+        
+        res.status(200).json({ message: "Order price updated and email notification sent." });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server error" });
