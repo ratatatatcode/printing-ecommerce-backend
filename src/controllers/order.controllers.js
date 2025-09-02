@@ -11,6 +11,18 @@ export const getCurrentUserOrders = async (req, res) => {
   }
 };
 
+export const getOrderById = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const [rows] = await pool.query("SELECT * FROM orders WHERE id = ?", [orderId]);
+    res.json(rows[0]);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const makeOrder = async (req, res) => {
   const { product, description, recipient, contactNo, email, address } = req.body;
   const userId = req.user?.id;
@@ -107,7 +119,7 @@ export const payOrder = async (req, res) => {
       `UPDATE orders SET paymentStatus = ? WHERE id = ?`,
       ["Paid", orderId]
     );
-
+    
     await connection.commit();
 
     res.status(200).json({
