@@ -1,6 +1,16 @@
 import { pool } from "../config/pool.js";
 import sendEmail from "../utils/sendEmail.js";
 
+export const getPendingItem = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`SELECT * FROM orders WHERE status = 'Pending'`);
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
 export const getSales = async (req, res) => {
     try {
         const [rows] = await pool.query(`SELECT * FROM orders WHERE status = 'Delivered' AND paymentStatus = 'Paid'`);
