@@ -50,7 +50,7 @@ export const register = async (req, res) => {
         );
 
         const token = jwt.sign({ email }, process.env.ACTIVATION_TOKEN, { expiresIn: "7d" });
-        const url = `${process.env.BACKEND_URL}/api/auth/activate/${token}`;
+        const url = `${process.env.FRONTEND_URL}/auth/activate/${encodeURIComponent(token)}`;
 
         await sendEmail({
             to: email,
@@ -111,9 +111,13 @@ export const login = async (req, res) => {
 
 export const activateAccount = async (req, res) => {
     const { token } = req.params;
+    
+    console.log("Incoming token:", token);
+    console.log("Activation secret:", process.env.ACTIVATION_TOKEN);
 
     try {
         const decoded = jwt.verify(token, process.env.ACTIVATION_TOKEN);
+        console.log("Decoded JWT:", decoded);
 
         const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [decoded.email]);
         if (rows.length === 0) {
@@ -129,7 +133,7 @@ export const activateAccount = async (req, res) => {
 
         res.json({ message: "Account activated successfully." });
     } catch (err) {
-        console.error(err);
+        console.error("JWT verify error:", err);
 
         if (err.name === "TokenExpiredError") {
             return res.status(400).json({ message: "Activation link expired" });
