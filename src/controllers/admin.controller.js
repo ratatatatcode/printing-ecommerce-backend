@@ -92,7 +92,10 @@ export const updatePrice = async (req, res) => {
     const { orderId, price } = req.body;
 
     try {
-        await pool.query("UPDATE orders SET price = ? WHERE id = ?", [price, orderId]);
+        await pool.query(
+            "UPDATE orders SET price = ?, status = ?, paymentStatus = ? WHERE id = ?",
+            [price, 'Processing', 'Paid', orderId]
+        );
 
         await sendEmail({
             to: email,

@@ -5,7 +5,7 @@ export const getUndeliveredItem = async (req, res) => {
     try {
         const [rows] = await pool.query(`
             SELECT * FROM orders 
-            WHERE status IN ('Processing', 'Shipped', 'Out for Delivery') 
+            WHERE status IN ('Pending', 'Processing', 'Shipped', 'Out for Delivery') 
             AND paymentStatus = 'Paid'
         `);
         res.json(rows);
