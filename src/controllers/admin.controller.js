@@ -1,6 +1,39 @@
 import { pool } from "../config/pool.js";
 import sendEmail from "../utils/sendEmail.js";
 
+export const getAllUsers = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                u.id,
+                u.firstName,
+                u.lastName,
+                u.username,
+                u.email,
+                u.contactNo,
+                u.birthdate,
+                u.address,
+                u.isActive,
+                COUNT(o.id) AS pendingOrdersCount
+            FROM users u
+            LEFT JOIN orders o 
+                ON u.id = o.userId 
+                AND o.status IN ("Pending", "Evaluate")
+            WHERE u.role = "regular"
+            GROUP BY u.id
+        `);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 export const getPendingItem = async (req, res) => {
     try {
         const [rows] = await pool.query(`SELECT * FROM orders WHERE status = 'Pending'`);
