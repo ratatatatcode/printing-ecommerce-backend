@@ -3,7 +3,11 @@ import sendEmail from "../utils/sendEmail.js";
 
 export const getUndeliveredItem = async (req, res) => {
     try {
-        const [rows] = await pool.query(`SELECT * FROM orders WHERE status IN ('Pending', 'Shipped')`);
+        const [rows] = await pool.query(`
+            SELECT * FROM orders 
+            WHERE status IN ('Pending', 'Shipped') 
+            AND paymentStatus = 'Paid'
+        `);
         res.json(rows);
     } catch (err) {
         console.error(err);
