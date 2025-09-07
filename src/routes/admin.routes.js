@@ -1,12 +1,12 @@
 import express from "express";
 import { isAuthenticated } from "../middlewares/isAuthenticated.js";
-import { getAllUsers, getSales, getPendingItem, updatePrice, deleteUser } from "../controllers/admin.controller.js";
+import { getAllUsers, getSales, getAllOrders, updatePrice, deleteUser } from "../controllers/admin.controller.js";
 
 const router = express.Router();
 
 router.get("/get-users", isAuthenticated, getAllUsers);
 router.get("/get-sales", isAuthenticated, getSales);
-router.get("/get-undelivered-items", isAuthenticated, getPendingItem);
+router.get("/get-orders", isAuthenticated, getAllOrders);
 router.put("/update-price", isAuthenticated, updatePrice);
 router.delete("/delete-user", isAuthenticated, deleteUser);
 

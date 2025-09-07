@@ -18,7 +18,7 @@ export const getAllUsers = async (req, res) => {
             FROM users u
             LEFT JOIN orders o 
                 ON u.id = o.userId 
-                AND o.status IN ("Pending", "Evaluate")
+                AND o.status IN ("Pending", "Evaluation")
             WHERE u.role = "regular"
             GROUP BY u.id
         `);
@@ -34,15 +34,49 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
-export const getPendingItem = async (req, res) => {
-    try {
-        const [rows] = await pool.query(`SELECT * FROM orders WHERE status = 'Pending'`);
-        res.json(rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Server error" });
-    }
-}
+export const getAllOrders = async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT 
+        o.id AS id,
+        o.userId,
+        o.product,
+        o.link,
+        o.design,
+        o.description,
+        o.recipient,
+        o.contactNo,
+        o.email,
+        o.address,
+        o.status,
+        o.paymentStatus,
+        o.price,
+        CAST(
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'paymentId', p.id,
+              'userId', p.userId,
+              'referenceId', p.referenceId,
+              'paymentUrl', p.paymentUrl
+            )
+          ) AS CHAR
+        ) AS payments
+      FROM orders o
+      LEFT JOIN payments p ON o.id = p.orderId
+      GROUP BY o.id
+    `);
+
+    const result = rows.map(row => ({
+        ...row,
+        payments: row.payments ? JSON.parse(row.payments) : []
+    }));
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const getSales = async (req, res) => {
     try {
