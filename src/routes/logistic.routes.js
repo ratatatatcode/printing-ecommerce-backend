@@ -5,6 +5,6 @@ import { getUndeliveredItem, updateDeliveryStatus } from "../controllers/logisti
 const router = express.Router();
 
 router.get("/get-undelivered-items", isAuthenticated, getUndeliveredItem);
-router.get("/update-status", isAuthenticated, updateDeliveryStatus);
+router.put("/update-status", isAuthenticated, updateDeliveryStatus);
 
 export default router;
