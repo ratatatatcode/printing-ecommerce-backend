@@ -88,6 +88,16 @@ export const getSales = async (req, res) => {
     }
 }
 
+export const getReviews = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`SELECT * FROM reviews`);
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
 export const updatePrice = async (req, res) => {
     const { orderId, price } = req.body;
 
