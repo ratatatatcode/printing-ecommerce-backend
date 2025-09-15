@@ -99,7 +99,7 @@ export const getReviews = async (req, res) => {
 }
 
 export const updatePrice = async (req, res) => {
-    const { orderId, price } = req.body;
+    const { orderId, price, email } = req.body;
 
     try {
         await pool.query(
@@ -121,7 +121,7 @@ export const updatePrice = async (req, res) => {
 }
 
 export const updateStatus = async (req, res) => {
-    const { orderId } = req.body;
+    const { orderId, email } = req.body;
 
     try {
         await pool.query(
@@ -135,7 +135,7 @@ export const updateStatus = async (req, res) => {
             text: "Your order is being processed. We will update you about the delivery status via email soon."
         });
         
-        res.status(200).json({ message: "Order price updated and email notification sent." });
+        res.status(200).json({ message: "Order status updated and email notification sent." });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server error" });
