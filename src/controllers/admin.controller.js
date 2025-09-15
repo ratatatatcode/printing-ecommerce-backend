@@ -103,14 +103,36 @@ export const updatePrice = async (req, res) => {
 
     try {
         await pool.query(
-            "UPDATE orders SET price = ?, status = ?, paymentStatus = ? WHERE id = ?",
-            [price, 'Processing', 'Paid', orderId]
+            "UPDATE orders SET price = ?, paymentStatus = ? WHERE id = ?",
+            [price, 'Unpaid', orderId]
         );
 
         await sendEmail({
             to: email,
             subject: `Price Update for Order: #${orderId}`,
             text: "Your order has been evaluated. Please proceed to pay the updated price listed on our website."
+        });
+        
+        res.status(200).json({ message: "Order price updated and email notification sent." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
+export const updateStatus = async (req, res) => {
+    const { orderId } = req.body;
+
+    try {
+        await pool.query(
+            "UPDATE orders SET status = ?, paymentStatus = ? WHERE id = ?",
+            ['Processing', 'Paid', orderId]
+        );
+
+        await sendEmail({
+            to: email,
+            subject: `Status Update for Order: #${orderId}`,
+            text: "Your order is being processed. We will update you about the delivery status via email soon."
         });
         
         res.status(200).json({ message: "Order price updated and email notification sent." });
