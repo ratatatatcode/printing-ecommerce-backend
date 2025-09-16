@@ -16,18 +16,18 @@ export const getUndeliveredItem = async (req, res) => {
 }
 
 export const updateDeliveryStatus = async (req, res) => {
-    const { orderId, status, address } = req.body;
+    const { orderId, status, email } = req.body;
 
     try {
         await pool.query("UPDATE orders SET status = ? WHERE id = ?", [status, orderId]);
 
         let feedback = ""; 
         if (status === "Shipped") {
-            feedback = `Your order #${orderId} has been shipped to: ${address}.`;
+            feedback = `The order #${orderId} has been shipped.`;
         } else if (status === "Delivered") {
-            feedback = `Your order #${orderId} has been delivered successfully.`;
+            feedback = `The order #${orderId} has been delivered successfully.`;
         } else {
-            feedback = `Your order #${orderId} status has been updated to: ${status}.`;
+            feedback = `The order #${orderId} status has been updated to: ${status}.`;
         }
 
         await sendEmail({
