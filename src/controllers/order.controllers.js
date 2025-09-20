@@ -24,7 +24,7 @@ export const getOrderById = async (req, res) => {
 };
 
 export const makeOrder = async (req, res) => {
-  const { product, description, recipient, contactNo, link, email, address } = req.body;
+  const { product, description, recipient, contactNo, link, email, address, isDeposit } = req.body;
   const userId = req.user?.id;
   let designUrl = null;
 
@@ -55,8 +55,8 @@ export const makeOrder = async (req, res) => {
     await pool.query(
       `INSERT INTO orders
         (userId, product, design, description, recipient, contactNo, link, email, address)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [userId, product, designUrl, description, recipient, contactNo, link, email, address]
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [userId, product, designUrl, description, recipient, contactNo, link, email, address, isDeposit]
     );
 
     res.status(201).json({
